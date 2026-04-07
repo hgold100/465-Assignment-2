@@ -3,12 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-<<<<<<< HEAD
-  tags: []
-=======
   tags:
   - ReadySphere
->>>>>>> origin/main
   layers:
   - Default
   - TransparentFX
