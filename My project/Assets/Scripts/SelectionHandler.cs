@@ -56,6 +56,27 @@ public class SelectionHandler : MonoBehaviour
         gameObject.SetActive(false);
     }
  
+    public void SetHover(bool hovering)
+    {
+        if (hasBeenSelected) return;
+        if (hovering && greenMaterial != null)
+            rend.material = greenMaterial;
+        else if (!hovering && blueMaterial != null)
+            rend.material = blueMaterial;
+    }
+
+    public void SelectSphere()
+    {
+        if (hasBeenSelected) return;
+        hasBeenSelected = true;
+
+        TrialManager trialManager = FindObjectOfType<TrialManager>();
+        if (trialManager != null)
+            trialManager.RecordResult(hit: true);
+
+        gameObject.SetActive(false);
+    }
+
     public void ResetSphere()
     {
         hasBeenSelected = false;
