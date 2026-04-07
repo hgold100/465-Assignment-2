@@ -1,23 +1,23 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
- 
+
 [RequireComponent(typeof(XRSimpleInteractable))]
 public class SelectionHandler : MonoBehaviour
 {
     [Header("Materials")]
     public Material blueMaterial;
     public Material greenMaterial;
- 
+
     private Renderer rend;
     private XRSimpleInteractable interactable;
     private bool hasBeenSelected = false;
- 
+
     void Awake()
     {
         rend = GetComponent<Renderer>();
         interactable = GetComponent<XRSimpleInteractable>();
- 
+
         if (interactable != null)
         {
             interactable.hoverEntered.AddListener(OnHoverEnter);
@@ -25,37 +25,44 @@ public class SelectionHandler : MonoBehaviour
             interactable.selectEntered.AddListener(OnSelected);
         }
     }
- 
+
     void Start()
     {
         if (blueMaterial != null)
             rend.material = blueMaterial;
     }
- 
+
     void OnHoverEnter(HoverEnterEventArgs args)
     {
         if (greenMaterial != null)
             rend.material = greenMaterial;
     }
- 
+
     void OnHoverExit(HoverExitEventArgs args)
     {
         if (!hasBeenSelected && blueMaterial != null)
             rend.material = blueMaterial;
     }
- 
+
     void OnSelected(SelectEnterEventArgs args)
     {
         if (hasBeenSelected) return;
         hasBeenSelected = true;
- 
-        TrialManager trialManager = FindObjectOfType<TrialManager>();
-        if (trialManager != null)
+
+        TrialManager trialManager = Object.FindFirstObjectByType<TrialManager>();
+        if (trialManager == null) return;
+
+        if (gameObject.CompareTag("ReadySphere"))
+        {
+            trialManager.OnReadySpherePressed();
+        }
+        else
+        {
             trialManager.RecordResult(hit: true);
- 
-        gameObject.SetActive(false);
+            gameObject.SetActive(false);
+        }
     }
- 
+
     public void SetHover(bool hovering)
     {
         if (hasBeenSelected) return;
@@ -70,7 +77,7 @@ public class SelectionHandler : MonoBehaviour
         if (hasBeenSelected) return;
         hasBeenSelected = true;
 
-        TrialManager trialManager = FindObjectOfType<TrialManager>();
+        TrialManager trialManager = Object.FindFirstObjectByType<TrialManager>();
         if (trialManager != null)
             trialManager.RecordResult(hit: true);
 
@@ -83,7 +90,7 @@ public class SelectionHandler : MonoBehaviour
         if (blueMaterial != null)
             rend.material = blueMaterial;
     }
- 
+
     void OnDestroy()
     {
         if (interactable != null)
