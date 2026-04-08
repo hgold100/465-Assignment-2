@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.08695, y: 0, z: 1.35156}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -127,7 +127,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.Interactables.XRSimpleInteractable
   m_InteractionManager: {fileID: 0}
-  m_Colliders: []
+  m_Colliders:
+  - {fileID: 6097588497580274263}
   m_InteractionLayers:
     m_Bits: 1
   m_DistanceCalculationMode: 1
@@ -200,5 +201,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82b1624d4c1399145a3c1b0e5933538b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectionHandler
-  blueMaterial: {fileID: 0}
-  greenMaterial: {fileID: 0}
+  blueMaterial: {fileID: 2100000, guid: 3cdd0e5797206a940a1a52402fae630e, type: 2}
+  greenMaterial: {fileID: 2100000, guid: 1768c06ec6077bd4f89688e77d1863d4, type: 2}
