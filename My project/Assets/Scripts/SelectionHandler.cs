@@ -78,10 +78,15 @@ public class SelectionHandler : MonoBehaviour
         hasBeenSelected = true;
 
         TrialManager trialManager = Object.FindFirstObjectByType<TrialManager>();
-        if (trialManager != null)
-            trialManager.RecordResult(hit: true);
+        if (trialManager == null) return;
 
-        gameObject.SetActive(false);
+        if (gameObject.CompareTag("ReadySphere"))
+            trialManager.OnReadySpherePressed();
+        else
+        {
+            trialManager.RecordResult(hit: true);
+            gameObject.SetActive(false);
+        }
     }
 
     public void ResetSphere()
