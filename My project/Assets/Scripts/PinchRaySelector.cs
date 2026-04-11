@@ -15,6 +15,10 @@ public class PinchRaySelector : MonoBehaviour
 
     private XRHandSubsystem handSubsystem;
     private bool wasPinching = false;
+    private bool wasTracked = false;
+    private float stabilizeTimer = 0f;
+    private const float stabilizeDelay = 1.5f;
+    private Transform xrOriginTransform;
 
     void Start()
     {
@@ -25,6 +29,18 @@ public class PinchRaySelector : MonoBehaviour
 
         if (lineRenderer != null)
             lineRenderer.positionCount = 2;
+
+        // Find XR Origin to convert tracking space to world space
+        var xrOrigin = FindObjectOfType<Unity.XR.CoreUtils.XROrigin>();
+        if (xrOrigin != null)
+            xrOriginTransform = xrOrigin.transform;
+    }
+
+    Vector3 ToWorld(Vector3 trackingPos)
+    {
+        if (xrOriginTransform != null)
+            return xrOriginTransform.TransformPoint(trackingPos);
+        return trackingPos;
     }
 
     void Update()
@@ -35,6 +51,22 @@ public class PinchRaySelector : MonoBehaviour
         if (!hand.isTracked)
         {
             wasPinching = false;
+            wasTracked = false;
+            stabilizeTimer = 0f;
+            if (lineRenderer != null) lineRenderer.enabled = false;
+            return;
+        }
+
+        // Hand just became tracked — wait for stabilization
+        if (!wasTracked)
+        {
+            wasTracked = true;
+            stabilizeTimer = 0f;
+        }
+
+        stabilizeTimer += Time.deltaTime;
+        if (stabilizeTimer < stabilizeDelay)
+        {
             if (lineRenderer != null) lineRenderer.enabled = false;
             return;
         }
@@ -70,34 +102,33 @@ public class PinchRaySelector : MonoBehaviour
             !thumbTipJoint.TryGetPose(out Pose thumbPose))
             return false;
 
-        return Vector3.Distance(indexPose.position, thumbPose.position) < pinchThreshold;
+        return Vector3.Distance(ToWorld(indexPose.position), ToWorld(thumbPose.position)) < pinchThreshold;
     }
 
     Vector3 GetRayOrigin(XRHand hand)
     {
-        // Use wrist as origin
         var wristJoint = hand.GetJoint(XRHandJointID.Wrist);
         if (wristJoint.TryGetPose(out Pose wristPose))
-            return wristPose.position;
+            return ToWorld(wristPose.position);
         return Vector3.zero;
     }
 
     Vector3 GetRayDirection(XRHand hand)
     {
-        // Aim from wrist toward index finger tip
         var wristJoint = hand.GetJoint(XRHandJointID.Wrist);
         var indexTipJoint = hand.GetJoint(XRHandJointID.IndexTip);
 
         if (wristJoint.TryGetPose(out Pose wristPose) &&
             indexTipJoint.TryGetPose(out Pose indexPose))
         {
-            Vector3 dir = (indexPose.position - wristPose.position).normalized;
+            Vector3 dir = (ToWorld(indexPose.position) - ToWorld(wristPose.position)).normalized;
             if (dir != Vector3.zero) return dir;
         }
 
-        // Fallback: use wrist forward
         if (wristJoint.TryGetPose(out Pose fallback))
-            return fallback.forward;
+            return xrOriginTransform != null
+                ? xrOriginTransform.TransformDirection(fallback.forward)
+                : fallback.forward;
 
         return Vector3.forward;
     }
